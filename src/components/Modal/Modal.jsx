@@ -7,23 +7,29 @@ export class Modal extends Component {
 
   componentDidMount() {
     console.log('Modal componentDidMount');
-    window.addEventListener('keydown', this.hendlePressESC)
+    console.log(this.props);
+    window.addEventListener('keydown', this.handlePressESC)
   }
+
   componentWillUnmount() {
-   window.removeEventListener('keydown', this.hendlePressESC)
+   window.removeEventListener('keydown', this.handlePressESC)
 }
 
-  hendlePressESC = (e) => {
+  handlePressESC = (e) => {
     if (e.code === 'Escape')
   this.props.onClick()
-}
+  }
+  handleClose = () => {
+    this.props.onClick()
+  }
+
   render() {
-     console.log('пропс на модалці--',this.prop) ;
+     console.log('пропс на модалці--', this.props.largeImageURL) ;
     return createPortal(
-     <div className={css.overlay}>
+     <div className={css.overlay} onClick={this.handleClose}>
         <div className={css.modal}>
-                {/* {this.props.cildren } */}
-          <img src="" alt="" />
+               
+          <img src={this.props.largeImageURL} alt="" />
         </div>
       </div>, modalRoot
 

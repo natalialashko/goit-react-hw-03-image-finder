@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 import { Button } from 'components/Button/Button';
 import css from './ImageGallery.module.css';
-import { Modal} from '../Modal/Modal';
+// import { Modal} from '../Modal/Modal';
 
 export class ImageGallery extends Component {
   state = {
@@ -11,16 +11,16 @@ export class ImageGallery extends Component {
    visible: true,
     error: null,
     status: 'idle',
-    showModal: false,
+    
   };
 
     componentDidUpdate(prevProps, prevState) {
         const prevName = prevProps.currentValueSearch;
         const nextName = this.props.currentValueSearch;
     if (prevName !== nextName) {
-      console.log('Змінились параметри пошуку');
-      console.log('prevProps.currentValueSearch:', prevName);
-      console.log('this.props.currentValueSearch:', nextName);
+      // console.log('Змінились параметри пошуку');
+      // console.log('prevProps.currentValueSearch:', prevName);
+      // console.log('this.props.currentValueSearch:', nextName);
       
       this.setState({ status: 'pending' });
      
@@ -72,19 +72,13 @@ export class ImageGallery extends Component {
   hendleLoadMoreClick = () => {
     this.setState(prevState => ({
       currentPage: prevState.currentPage + 1,
-      visible: true,
+      visible:false,
     }), this.fetchImages);
   }
 
-  toggleModal = () => {
-     console.log('***',this.props)
-    this.setState(({ showModal }) =>
-      ({ showModal: !showModal }));
-  };
-
   render() {
-    const { images, error, status, visible, showModal } = this.state;
-    // const { currentValueSearch } = this.props;
+    const { images, error, status, visible } = this.state;
+    
     if (status === 'idle') {
       return <div>Введіть параметри пошуку</div>;
     }
@@ -103,12 +97,12 @@ export class ImageGallery extends Component {
                 key={image.id}
                 webformatURL={image.webformatURL}
                 largeImageURL={image.largeImageURL}
-                onClick={this.toggleModal}
+                // onClick={this.toggleModal}
               />
             ))}
           </ul>
-          <Button onClick={this.hendleLoadMoreClick} visible={visible} />
-          {showModal && <Modal largeImageURL={this.prop.largeImageURL } onClick={this.toggleModal} /> }
+           {images.length>0 && <Button onClick={this.hendleLoadMoreClick} visible={visible} />}
+                  
         </>
       );
     }
