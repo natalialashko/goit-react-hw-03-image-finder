@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 import { Button } from 'components/Button/Button';
-import css from './ImageGallery.module.css'
+import css from './ImageGallery.module.css';
+import { Modal} from '../Modal/Modal';
 
 export class ImageGallery extends Component {
   state = {
@@ -10,6 +11,7 @@ export class ImageGallery extends Component {
    visible: true,
     error: null,
     status: 'idle',
+    showModal: false,
   };
 
     componentDidUpdate(prevProps, prevState) {
@@ -35,8 +37,8 @@ export class ImageGallery extends Component {
             )
           );
         })
-        .then(images => this.setState({ images: images.hits , status: 'resolved', visible: true, currentPage:1}))
-        .catch(error => this.setState({ error, status: 'rejected', visible: false  }))
+        .then(images => this.setState({ images: images.hits , status: 'resolved' }))
+        .catch(error => this.setState({ error, status: 'rejected'  }))
        
     }
   }
@@ -48,19 +50,19 @@ export class ImageGallery extends Component {
     console.log('nextName', nextName);
     console.log('arrayImage', arrayImage);
 
-    fetch(
-      `https://pixabay.com/api/?q=${nextName}&page=${currentPage}&key=34821282-c80c361baf29d3d77b8526c1f&image_type=photo&orientation=horizontal&per_page=12`
-    )
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        }
-        return Promise.reject(
-          new Error(
-            `Згідно Вашого запиту ${nextName} картинки відсутні, введіть новий запит`
-          )
-        );
-      })
+     fetch(
+        `https://pixabay.com/api/?q=${nextName}&page=${currentPage}&key=34821282-c80c361baf29d3d77b8526c1f&image_type=photo&orientation=horizontal&per_page=12`
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          return Promise.reject(
+            new Error(
+              `Згідно Вашого запиту ${nextName} картинки відсутні, введіть новий запит`
+            )
+          );
+        })
       .then(images => this.setState({ images:[...arrayImage, ...images.hits], status: 'resolved', visible: true }))
       .catch(error => this.setState({ error, status: 'rejected',visible: false }));
     console.log(this.state.images)
@@ -74,8 +76,14 @@ export class ImageGallery extends Component {
     }), this.fetchImages);
   }
 
+  toggleModal = () => {
+     console.log('***',this.props)
+    this.setState(({ showModal }) =>
+      ({ showModal: !showModal }));
+  };
+
   render() {
-    const { images, error, status, visible } = this.state;
+    const { images, error, status, visible, showModal } = this.state;
     // const { currentValueSearch } = this.props;
     if (status === 'idle') {
       return <div>Введіть параметри пошуку</div>;
@@ -94,10 +102,13 @@ export class ImageGallery extends Component {
               <ImageGalleryItem
                 key={image.id}
                 webformatURL={image.webformatURL}
+                largeImageURL={image.largeImageURL}
+                onClick={this.toggleModal}
               />
             ))}
           </ul>
-          <Button  onClick={this.hendleLoadMoreClick} visible={visible}/>
+          <Button onClick={this.hendleLoadMoreClick} visible={visible} />
+          {showModal && <Modal largeImageURL={this.prop.largeImageURL } onClick={this.toggleModal} /> }
         </>
       );
     }

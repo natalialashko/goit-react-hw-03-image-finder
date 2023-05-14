@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { Component } from 'react';
 import css from './ImageGalleryItem.module.css'
 
-export const ImageGalleryItem = ({ id, webformatURL }) => {
+export class ImageGalleryItem extends Component {
+  hendleClick = () => {
+    console.log(this.props.largeImageURL)
+    return this.props.largeImageURL
+  }
+  render() {
+    const { id, webformatURL,  type } = this.props;
+        
   return (
     <li key={id} className={css.gallery_item}>
-      <img className={css.gallery_item_img}src={webformatURL} alt="" width="100" />
+      <img className={css.gallery_item_img} src={webformatURL}
+        alt={type} width="100" onClick={this.hendleClick} />
     </li>
   );
 };
+}
+
