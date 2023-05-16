@@ -11,18 +11,21 @@ export class ImageGallery extends Component {
    visible: true,
     error: null,
     status: 'idle',
+    totalHits: 0,
     
   };
 
     componentDidUpdate(prevProps, prevState) {
         const prevName = prevProps.currentValueSearch;
-        const nextName = this.props.currentValueSearch;
+      const nextName = this.props.currentValueSearch;
+      const currentPage = this.state.currentPage;
     if (prevName !== nextName) {
-      // console.log('Змінились параметри пошуку');
-      // console.log('prevProps.currentValueSearch:', prevName);
-      // console.log('this.props.currentValueSearch:', nextName);
-      
-      this.setState({ status: 'pending' });
+      console.log('Змінились параметри пошуку');
+      console.log('prevProps.currentValueSearch:', prevName);
+      console.log('this.props.currentValueSearch:', nextName);
+      console.log('this.props.currentPage:', currentPage);
+       console.log('prev.currentPage:', prevProps.currentPage);
+      this.setState({ status: 'pending', currentPage: 1});
      
       fetch(
         `https://pixabay.com/api/?q=${nextName}&page=1&key=34821282-c80c361baf29d3d77b8526c1f&image_type=photo&orientation=horizontal&per_page=12`
@@ -37,8 +40,8 @@ export class ImageGallery extends Component {
             )
           );
         })
-        .then(images => this.setState({ images: images.hits , status: 'resolved' }))
-        .catch(error => this.setState({ error, status: 'rejected'  }))
+        .then(images => this.setState({ images: images.hits , status: 'resolved', totalHits: images.totalHits  }))
+        .catch(error => this.setState({ error, status: 'rejected', currentPage: 1  }))
        
     }
   }
@@ -46,6 +49,7 @@ export class ImageGallery extends Component {
     const currentPage = this.state.currentPage;
     const nextName = this.props.currentValueSearch;
     const arrayImage = this.state.images;
+
     console.log('this.state.currentPage', currentPage);
     console.log('nextName', nextName);
     console.log('arrayImage', arrayImage);
@@ -55,6 +59,7 @@ export class ImageGallery extends Component {
       )
         .then(response => {
           if (response.ok) {
+           
             return response.json();
           }
           return Promise.reject(
@@ -64,7 +69,7 @@ export class ImageGallery extends Component {
           );
         })
       .then(images => this.setState({ images:[...arrayImage, ...images.hits], status: 'resolved', visible: true }))
-      .catch(error => this.setState({ error, status: 'rejected',visible: false }));
+      .catch(error => this.setState({ error, status: 'rejected',visible: false, currentPage: 1 }));
     console.log(this.state.images)
    
   }
@@ -77,7 +82,7 @@ export class ImageGallery extends Component {
   }
 
   render() {
-    const { images, error, status, visible } = this.state;
+    const { images, error, status, visible, totalHits } = this.state;
     
     if (status === 'idle') {
       return <div>Введіть параметри пошуку</div>;
@@ -97,11 +102,11 @@ export class ImageGallery extends Component {
                 key={image.id}
                 webformatURL={image.webformatURL}
                 largeImageURL={image.largeImageURL}
-                // onClick={this.toggleModal}
+                
               />
             ))}
           </ul>
-           {images.length>0 && <Button onClick={this.hendleLoadMoreClick} visible={visible} />}
+           {images.length<totalHits && <Button onClick={this.hendleLoadMoreClick} visible={visible} />}
                   
         </>
       );
